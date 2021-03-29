@@ -1,13 +1,14 @@
 <?php
 	header("Content-Type: text/plain");
 	include_once("functions.php");
-
-	$clanManagement = clanManagement();
-	$MessageData = createMessage($clanManagement);
 	
-	if(in_array(date('D'), DAYS_TO_POST)) { 
-		sendDiscordMessage($MessageData);
+	$pw = @$_GET["pw"];
+	
+	$clanManagement = clanManagement();
+
+	if(DISCORD_ENABLED && in_array(date('D'), DISCORD_DAYS_TO_POST) && $pw == DISCORD_PASSWORD) { 
+		sendDiscordMessage(createMessage($clanManagement, false));
 	}
 	
-	printData($MessageData);
+	printData(createMessage($clanManagement, true));
 ?>

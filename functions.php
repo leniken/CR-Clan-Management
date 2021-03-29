@@ -63,27 +63,32 @@
 		$demotion = [];
 		$kick = [];
 		foreach ($statArray as $name => $data){
-			
-			if($data["battlecount"] >= PROMOTION_WAR_ATTACKS && $data["donations"] >= PROMOTION_DONATION && $data["role"] == "member"){
-				$promotion[$name] = array($data["battlecount"], $data["donations"]);
+			if(PROMOTION_STRICT){
+				if($data["battlecount"] >= PROMOTION_WAR_ATTACKS && $data["donations"] >= PROMOTION_DONATION && $data["role"] == "member"){
+					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				}
+			} else {
+				if(($data["battlecount"] >= PROMOTION_WAR_ATTACKS || $data["donations"] >= PROMOTION_DONATION) && $data["role"] == "member"){
+					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				}
 			}
 			
-			if(STRICT){
-				if(($data["battlecount"] < PROMOTION_WAR_ATTACKS || $data["donations"] < PROMOTION_DONATION) && $data["role"] == "elder"){
-				$demotion[$name] = array($data["battlecount"], $data["donations"]);
-			}
-			}else {
-				if($data["battlecount"] < PROMOTION_WAR_ATTACKS && $data["donations"] < PROMOTION_DONATION && $data["role"] == "elder"){
+			if(DEMOTION_STRICT){
+				if($data["battlecount"] < DEMOTION_WAR_ATTACKS && $data["donations"] < DEMOTION_DONATION && $data["role"] == "elder"){
 					$demotion[$name] = array($data["battlecount"], $data["donations"]);
 				}
+			} else {
+				if(($data["battlecount"] < DEMOTION_WAR_ATTACKS || $data["donations"] < DEMOTION_DONATION) && $data["role"] == "elder"){
+				$demotion[$name] = array($data["battlecount"], $data["donations"]);
+				}
 			}
 			
-			if(STRICT){
-				if(($data["battlecount"] < KICK_WAR || $data["donations"] < KICK_DONATION) && $data["role"] == "member"){
+			if(KICK_STRICT){
+				if($data["battlecount"] < KICK_WAR && $data["donations"] < KICK_DONATION && $data["role"] == "member"){
 					$kick[$name] = array($data["battlecount"], $data["donations"]);
 				}
-			}else {
-				if($data["battlecount"] < KICK_WAR && $data["donations"] < KICK_DONATION && $data["role"] == "member"){
+			} else {
+				if(($data["battlecount"] < KICK_WAR || $data["donations"] < KICK_DONATION) && $data["role"] == "member"){
 					$kick[$name] = array($data["battlecount"], $data["donations"]);
 				}
 			}
@@ -99,37 +104,73 @@
 		return $return;
 	}
 
-	function createMessage($clanManagement){
+	function createMessage($clanManagement, $plain){
 		
-		$header	= "It's time for clan management. Here are the bots proposals of this week <@&404707606725394442>\r\n\r\n";
+		$header	= "It's time for clan management. Here are the proposals of this week ". DISCORD_ROLE_ID ."\r\n\r\n";
 		
-		$promoHead =  "**Promotion :star_struck:**\r\n";
+		if($plain){
+			$promoHead =  "** Promotion:\r\n";
+		} else {
+			$promoHead =  "**Promotion :star_struck:**\r\n";
+		}
 		if(sizeof($clanManagement[0]) == 0){
-			$promoContent =  "    none :slight_frown:\r\n";
+			if($plain){
+				$promoContent =  "  none\r\n";
+			} else {
+				$promoContent =  "  none :slight_frown:\r\n";
+			}
 		} else {
 			$promoContent = "";
 			foreach($clanManagement[0] as $name=>$data){
-				$promoContent =  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				if($plain){
+					$promoContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
+				} else {
+					$promoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				}
 			}
 		}
-
-		$demoHead =  "**Demotion :cry:**\r\n";
+		
+		if($plain){
+			$demoHead =  "** Demotion:\r\n";
+		} else {
+			$demoHead =  "**Demotion :cry:**\r\n";
+		}
 		if(sizeof($clanManagement[1]) == 0){
-			$demoContent =  "    none :smiling_face_with_3_hearts:\r\n";
+			if($plain){
+				$demoContent =  "  none\r\n";
+			} else {
+				$demoContent =  "  none :smiling_face_with_3_hearts:\r\n";
+			}
 		} else {
 			$demoContent = "";
 			foreach($clanManagement[1] as $name=>$data){
-				$demoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				if($plain){
+					$demoContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
+				} else {
+					$demoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				}
 			}
 		}
-
-		$kickHead =  "**Kick :mans_shoe:**\r\n";
+		
+		if($plain){
+			$kickHead =  "** Kick:\r\n";
+		} else {
+			$kickHead =  "**Kick :mans_shoe:**\r\n";
+		}
 		if(sizeof($clanManagement[2]) == 0){
-			$kickContent =  "    none :partying_face:\r\n";
+			if($plain){
+				$kickContent =  "  none\r\n";
+			} else {
+				$kickContent =  "  none :partying_face:\r\n";
+			}
 		} else {
 			$kickContent = "";
 			foreach($clanManagement[2] as $name=>$data){
-				$kickContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				if($plain){
+					$kickContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
+				} else {
+					$kickContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+				}
 			}
 		}
 		
@@ -154,10 +195,7 @@
 			// Message
 			"content" => $messageData[0],
 			// Username
-			"username" => BOT_USERNAME,
-
-			// Avatar URL.
-			"avatar_url" => BOT_AVATAR,
+			"username" => DISCORD_BOT_USERNAME,
 
 			"embeds" => [
 				[
@@ -207,8 +245,6 @@
 		// If you need to debug, or find out why you can't send message uncomment line below, and execute script.
 		//echo $response;
 		curl_close( $ch );
-		
-		return $messageData;
 
 	}
 	
