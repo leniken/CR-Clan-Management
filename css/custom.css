@@ -1,12 +1,4 @@
 /* CUSTOM */
-.cards {
-	background-color: transparent; 
-	border:none;
-	position: relative;
-}
-.cards img {
-	width: 120px;
-}
 .title-pic {
 	background-image: url(../img/CR_TwitterCover_1500x500.jpg);
     background-size: cover;
@@ -22,17 +14,8 @@
 	padding: 6px 6px 0px 6px;
 	background-color: rgba(0,0,0,0.3);
 }
-
-.mycontent {
-	margin: 0 !important;
-	padding: 0 !important;
-	min-height: 70vh;
-}
-.mycontent .heading {
-	padding-top:48px;
-}
-.mycontent .bg-dark {
-	margin: 0 !important;
+.jumbotron {
+	border-radius: 0;
 }
 
 .mycontent .discord-link {
@@ -52,7 +35,8 @@
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
-	width:8%;
+	width:15%;
+	min-width:200px;
 	margin-bottom:26px;
 }
 .mycontent .discord-link img{

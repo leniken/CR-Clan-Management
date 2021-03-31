@@ -149,11 +149,11 @@
 			return array(
 				discordToHtml($header), 
 				discordToHtml($promoHead), 
-				discordToHtml($promoContent), 
+				discordToHtml(spaceToNbsp($promoContent)), 
 				discordToHtml($demoHead), 
-				discordToHtml($demoContent), 
+				discordToHtml(spaceToNbsp($demoContent)), 
 				discordToHtml($kickHead), 
-				discordToHtml($kickContent)
+				discordToHtml(spaceToNbsp($kickContent))
 			);
 		}
 		return array($header, $promoHead, $promoContent, $demoHead, $demoContent, $kickHead, $kickContent);
@@ -242,13 +242,16 @@
                 ':slight_frown:'    =>  '',
                 ':star_struck:'   =>  '',
                 ':small_blue_diamond:'    =>  '&bull;',
-                ':boom:'    =>  '',
-                ':gift:'    =>  '',
+                ':boom:'    =>  '&#128481;',
+                ':gift:'    =>  '&#128230;',
                 ':cry:'    =>  '',
                 ':smiling_face_with_3_hearts:'   =>  '',
                 ':mans_shoe:'   =>  '',
-                ':partying_face:'    =>  '',
-				' ' => '&nbsp;'
+                ':partying_face:'    =>  ''
         );
 		return preg_replace('#\*{2}(.*?)\*{2}#', '<span class="cm-header">$1</span>',nl2br(strtr($text, $icons)));
     }
+	
+	function spaceToNbsp($text){
+		return str_replace(' ', '&nbsp;', $text);
+	}
