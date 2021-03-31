@@ -12,6 +12,9 @@
 	/* Clan Tag of your clan */
 	const CLAN_TAG = ""; 
 	
+	/* Define the minimum level of a member to be considered for clan management. Default is level 6 */
+	MIN_LEVEL = 6;
+	
 	/* Define promotion parameters for your clan: Player is member and must have more than the parameters to be promoted. Set to 0 if you do not want to monitor a parameter.
 	   Stict parametere defines if the member has to fullfil both (true) or just one (false) parameter to get a promotion */
 	const PROMOTION_WAR_ATTACKS = 12;	

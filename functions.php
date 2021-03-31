@@ -30,7 +30,9 @@
 
 		$statArray = [];
 		foreach($clan['memberList'] as $member){
-			$statArray[$member["name"]] = array("donations" => $member["donations"], "role" => $member["role"]);
+			if($member['expLevel'] >= MIN_LEVEL){
+				$statArray[$member["name"]] = array("donations" => $member["donations"], "role" => $member["role"]);
+			}
 		}
 		
 		/* Get war battles */
@@ -104,77 +106,56 @@
 		return $return;
 	}
 
-	function createMessage($clanManagement, $plain){
+	function createMessage($clanManagement, $html){
 		
-		$header	= "It's time for clan management. Here are the proposals of this week ". DISCORD_ROLE_ID ."\r\n\r\n";
-		
-		if($plain){
-			$promoHead =  "** Promotion:\r\n";
+		if($html){
+			$header	= "It's time for clan management. Here are the proposals of this week\r\n\r\n";
 		} else {
-			$promoHead =  "**Promotion :star_struck:**\r\n";
+			$header	= "It's time for clan management. Here are the proposals of this week ". DISCORD_ROLE_ID ."\r\n\r\n";
 		}
+		
+		
+		$promoHead =  "**Promotion :star_struck:**\r\n";
 		if(sizeof($clanManagement[0]) == 0){
-			if($plain){
-				$promoContent =  "  none\r\n";
-			} else {
-				$promoContent =  "  none :slight_frown:\r\n";
-			}
+			$promoContent =  "  none :slight_frown:\r\n";
 		} else {
 			$promoContent = "";
 			foreach($clanManagement[0] as $name=>$data){
-				if($plain){
-					$promoContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
-				} else {
-					$promoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
-				}
+				$promoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
 			}
 		}
 		
-		if($plain){
-			$demoHead =  "** Demotion:\r\n";
-		} else {
-			$demoHead =  "**Demotion :cry:**\r\n";
-		}
+		$demoHead =  "**Demotion :cry:**\r\n";
 		if(sizeof($clanManagement[1]) == 0){
-			if($plain){
-				$demoContent =  "  none\r\n";
-			} else {
-				$demoContent =  "  none :smiling_face_with_3_hearts:\r\n";
-			}
+			$demoContent =  "  none :smiling_face_with_3_hearts:\r\n";
 		} else {
 			$demoContent = "";
 			foreach($clanManagement[1] as $name=>$data){
-				if($plain){
-					$demoContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
-				} else {
-					$demoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
-				}
+				$demoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
 			}
 		}
 		
-		if($plain){
-			$kickHead =  "** Kick:\r\n";
-		} else {
-			$kickHead =  "**Kick :mans_shoe:**\r\n";
-		}
+		$kickHead =  "**Kick :mans_shoe:**\r\n";
 		if(sizeof($clanManagement[2]) == 0){
-			if($plain){
-				$kickContent =  "  none\r\n";
-			} else {
-				$kickContent =  "  none :partying_face:\r\n";
-			}
+			$kickContent =  "  none :partying_face:\r\n";
 		} else {
 			$kickContent = "";
 			foreach($clanManagement[2] as $name=>$data){
-				if($plain){
-					$kickContent .=  "  ".$name." - Attacks: ".$data[0]." - Donations: ".$data[1]."\r\n";
-				} else {
-					$kickContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
-				}
+				$kickContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
 			}
 		}
 		
-		
+		if($html){
+			return array(
+				discordToHtml($header), 
+				discordToHtml($promoHead), 
+				discordToHtml($promoContent), 
+				discordToHtml($demoHead), 
+				discordToHtml($demoContent), 
+				discordToHtml($kickHead), 
+				discordToHtml($kickContent)
+			);
+		}
 		return array($header, $promoHead, $promoContent, $demoHead, $demoContent, $kickHead, $kickContent);
 	}
 	
@@ -255,3 +236,19 @@
 			echo $message;
 		}
 	}
+	
+	function discordToHtml($text) {
+        $icons = array(
+                ':slight_frown:'    =>  '',
+                ':star_struck:'   =>  '',
+                ':small_blue_diamond:'    =>  '&bull;',
+                ':boom:'    =>  '',
+                ':gift:'    =>  '',
+                ':cry:'    =>  '',
+                ':smiling_face_with_3_hearts:'   =>  '',
+                ':mans_shoe:'   =>  '',
+                ':partying_face:'    =>  '',
+				' ' => '&nbsp;'
+        );
+		return preg_replace('#\*{2}(.*?)\*{2}#', '<span class="cm-header">$1</span>',nl2br(strtr($text, $icons)));
+    }

@@ -1,0 +1,76 @@
+/* CUSTOM */
+.cards {
+	background-color: transparent; 
+	border:none;
+	position: relative;
+}
+.cards img {
+	width: 120px;
+}
+.title-pic {
+	background-image: url(../img/CR_TwitterCover_1500x500.jpg);
+    background-size: cover;
+    background-position-y: 33%;
+    height: 30vh;
+    margin: 0 !important;
+}
+.title-pic .lead form {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 6px 0 0 6px;
+	padding: 6px 6px 0px 6px;
+	background-color: rgba(0,0,0,0.3);
+}
+
+.mycontent {
+	margin: 0 !important;
+	padding: 0 !important;
+	min-height: 70vh;
+}
+.mycontent .heading {
+	padding-top:48px;
+}
+.mycontent .bg-dark {
+	margin: 0 !important;
+}
+
+.mycontent .discord-link {
+	border-radius: 8px;
+    border: 2px solid hsla(0,0%,100%,.05);
+    -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+    position: relative;
+    overflow: hidden;
+    background-clip: padding-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+	width:8%;
+	margin-bottom:26px;
+}
+.mycontent .discord-link img{
+	width:100%;
+}
+
+.mycontent .cm-header {
+	margin-top:10px;
+	display: inline-block;
+	font-weight:bold;
+}
+
+.overlay {
+	margin-left: -6em;
+    margin-top: 6.5em;
+    font-size: 1em;
+    opacity: .45;
+    color: white;
+    background-color: black;
+	position: absolute;
+}
