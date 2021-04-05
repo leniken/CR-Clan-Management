@@ -30,9 +30,7 @@
 
 		$statArray = [];
 		foreach($clan['memberList'] as $member){
-			if($member['expLevel'] >= MIN_LEVEL){
 				$statArray[$member["name"]] = array("donations" => $member["donations"], "role" => $member["role"]);
-			}
 		}
 		
 		/* Get war battles */
@@ -55,56 +53,73 @@
 		
 		/* store war battles */
 		foreach($race["clan"]["participants"] as $player){
-		$statArray[$player["name"]]["battlecount"] = $player["decksUsed"];
+			$statArray[$player["name"]]["battlecount"] = $player["decksUsed"];
 		}
 		
 		/*
-		** Geneate clan management data
+		** Generate clan management data
 		*/
-		$promotion = [];
-		$demotion = [];
-		$kick = [];
-		foreach ($statArray as $name => $data){
-			if(PROMOTION_STRICT){
-				if($data["battlecount"] >= PROMOTION_WAR_ATTACKS && $data["donations"] >= PROMOTION_DONATION && $data["role"] == "member"){
-					$promotion[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			} else {
-				if(($data["battlecount"] >= PROMOTION_WAR_ATTACKS || $data["donations"] >= PROMOTION_DONATION) && $data["role"] == "member"){
-					$promotion[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			}
-			
-			if(DEMOTION_STRICT){
-				if($data["battlecount"] < DEMOTION_WAR_ATTACKS && $data["donations"] < DEMOTION_DONATION && $data["role"] == "elder"){
-					$demotion[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			} else {
-				if(($data["battlecount"] < DEMOTION_WAR_ATTACKS || $data["donations"] < DEMOTION_DONATION) && $data["role"] == "elder"){
-				$demotion[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			}
-			
-			if(KICK_STRICT){
-				if($data["battlecount"] < KICK_WAR && $data["donations"] < KICK_DONATION && $data["role"] == "member"){
-					$kick[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			} else {
-				if(($data["battlecount"] < KICK_WAR || $data["donations"] < KICK_DONATION) && $data["role"] == "member"){
-					$kick[$name] = array($data["battlecount"], $data["donations"]);
-				}
-			}
-			
-		}
-
-	
-		$return = [];
-		$return[] = $promotion;
-		$return[] = $demotion;
-		$return[] = $kick;
 		
+		/* Define return array */
+		$return = [];
+		
+		/* loop the players */
+		foreach ($statArray as $name => $data){
+			
+			/* check players clan rank */
+			if($member['expLevel'] >= MIN_LEVEL){
+
+				$return[] = doPromotion($name, $data, $return);
+				$return[] = doDemotionn($name, $data, $return);
+
+			}
+		}
+		
+		/* return the result */
 		return $return;
 	}
+
+	function doPromotion($rank, $name, $data, $return){
+		$enabled = "DO_".$data["role"]."_MANAGEMENT";
+		$strict = $data["role"]."_PROMOTION_STRICT";
+		$war = $data["role"]."_PROMOTION_WAR_ATTACKS";
+		$donation = $data["role"]."_PROMOTION_DONATION";
+		$monitorWar = $data["role"]."_MONITOR_WAR_ATTACKS";
+		$monitorDono = $data["role"]."_MONITOR_DONATIONS";
+	
+		if(constant($enabled)){
+			if(constant($strict)){
+				if($data["battlecount"] >= PROMOTION_WAR_ATTACKS && $data["donations"] >= PROMOTION_DONATION){
+					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				}
+			} else {
+				if(($data["battlecount"] >= PROMOTION_WAR_ATTACKS || $data["donations"] >= PROMOTION_DONATION)){
+					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				}
+			}
+		}
+		
+	}
+	
+	function doDemotion($rank, $name, $data, $return){
+		$enabled = "DO_".$data["role"]."_MANAGEMENT";
+		$strict = $data["role"]."_DEMOTION_STRICT";
+		$war = $data["role"]."_DEMOTION_WAR_ATTACKS";
+		$donation = $data["role"]."_DEMOTION_DONATION";
+		$monitorWar = $data["role"]."_MONITOR_WAR_ATTACKS";
+		$monitorDono = $data["role"]."_MONITOR_DONATIONS";
+		
+		if(DEMOTION_STRICT){
+			if($data["battlecount"] < DEMOTION_WAR_ATTACKS && $data["donations"] < DEMOTION_DONATION){
+				$demotion[$name] = array($data["battlecount"], $data["donations"]);
+			}
+		} else {
+			if(($data["battlecount"] < DEMOTION_WAR_ATTACKS || $data["donations"] < DEMOTION_DONATION)){
+			$demotion[$name] = array($data["battlecount"], $data["donations"]);
+			}
+		}
+	}
+
 
 	function createMessage($clanManagement, $html){
 		
