@@ -29,8 +29,10 @@
 		$clan = json_decode ($clanDataJSON , $assoc = TRUE);	
 
 		$statArray = [];
-		foreach($clan['memberList'] as $member){
-				$statArray[$member["name"]] = array("donations" => $member["donations"], "role" => $member["role"]);
+		foreach($clan["memberList"] as $member){
+			if($member["expLevel"] >= MIN_LEVEL && $member["role"] != "leader"){
+				$statArray[$member["tag"]] = array("name" => $member["name"], "donations" => $member["donations"], "role" => $member["role"]);
+			}
 		}
 		
 		/* Get war battles */
@@ -53,7 +55,9 @@
 		
 		/* store war battles */
 		foreach($race["clan"]["participants"] as $player){
-			$statArray[$player["name"]]["battlecount"] = $player["decksUsed"];
+			if(array_key_exists($player["tag"], $statArray)){
+				$statArray[$player["tag"]]["battlecount"] = $player["decksUsed"];
+			}
 		}
 		
 		/*
@@ -64,61 +68,67 @@
 		$return = [];
 		
 		/* loop the players */
-		foreach ($statArray as $name => $data){
+		foreach ($statArray as $tag => $data){
 			
-			/* check players clan rank */
-			if($member['expLevel'] >= MIN_LEVEL){
-
-				$return[] = doPromotion($name, $data, $return);
-				$return[] = doDemotionn($name, $data, $return);
-
-			}
+			/* Check action to take for each member equal or above MIN_LEVEL */
+			$statArray[$tag]["action"] = max(doPromotion($data), doDemotion($data));
 		}
 		
 		/* return the result */
-		return $return;
+		return $statArray;
 	}
 
-	function doPromotion($rank, $name, $data, $return){
+	
+	function doPromotion($data){
 		$enabled = "DO_".$data["role"]."_MANAGEMENT";
 		$strict = $data["role"]."_PROMOTION_STRICT";
 		$war = $data["role"]."_PROMOTION_WAR_ATTACKS";
 		$donation = $data["role"]."_PROMOTION_DONATION";
-		$monitorWar = $data["role"]."_MONITOR_WAR_ATTACKS";
-		$monitorDono = $data["role"]."_MONITOR_DONATIONS";
-	
+
 		if(constant($enabled)){
 			if(constant($strict)){
-				if($data["battlecount"] >= PROMOTION_WAR_ATTACKS && $data["donations"] >= PROMOTION_DONATION){
-					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				if($data["battlecount"] >= constant($war) && $data["donations"] >= constant($donation)){
+					return 3;
 				}
 			} else {
-				if(($data["battlecount"] >= PROMOTION_WAR_ATTACKS || $data["donations"] >= PROMOTION_DONATION)){
-					$promotion[$name] = array($data["battlecount"], $data["donations"]);
+				if($data["battlecount"] >= constant($war) || $data["donations"] >= constant($donation)){
+					return 3;
 				}
 			}
 		}
+		return 0;
+		
 		
 	}
 	
-	function doDemotion($rank, $name, $data, $return){
+	function doDemotion($data){
 		$enabled = "DO_".$data["role"]."_MANAGEMENT";
 		$strict = $data["role"]."_DEMOTION_STRICT";
 		$war = $data["role"]."_DEMOTION_WAR_ATTACKS";
 		$donation = $data["role"]."_DEMOTION_DONATION";
-		$monitorWar = $data["role"]."_MONITOR_WAR_ATTACKS";
-		$monitorDono = $data["role"]."_MONITOR_DONATIONS";
 		
-		if(DEMOTION_STRICT){
-			if($data["battlecount"] < DEMOTION_WAR_ATTACKS && $data["donations"] < DEMOTION_DONATION){
-				$demotion[$name] = array($data["battlecount"], $data["donations"]);
-			}
-		} else {
-			if(($data["battlecount"] < DEMOTION_WAR_ATTACKS || $data["donations"] < DEMOTION_DONATION)){
-			$demotion[$name] = array($data["battlecount"], $data["donations"]);
+		if(constant($enabled)){
+			if(constant($strict) && constant($war) != 0 && constant($donation) != 0){
+				if($data["battlecount"] < constant($war) && $data["donations"] < constant($donation)){
+					if($data["role"] == "member"){
+						return 1;
+					} else {
+						return 2;
+					}
+				}
+			} else {
+				if(($data["battlecount"] < constant($war) && constant($war) != 0) || ($data["donations"] < constant($donation) && constant($donation) != 0)){
+					if($data["role"] == "member"){
+						return 1;
+					} else {
+						return 2;
+					}
+				}
 			}
 		}
+		return 0;
 	}
+	
 
 
 	function createMessage($clanManagement, $html){
@@ -128,36 +138,39 @@
 		} else {
 			$header	= "It's time for clan management. Here are the proposals of this week ". DISCORD_ROLE_ID ."\r\n\r\n";
 		}
-		
-		
 		$promoHead =  "**Promotion :star_struck:**\r\n";
-		if(sizeof($clanManagement[0]) == 0){
-			$promoContent =  "  none :slight_frown:\r\n";
-		} else {
-			$promoContent = "";
-			foreach($clanManagement[0] as $name=>$data){
-				$promoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
-			}
-		}
-		
 		$demoHead =  "**Demotion :cry:**\r\n";
-		if(sizeof($clanManagement[1]) == 0){
-			$demoContent =  "  none :smiling_face_with_3_hearts:\r\n";
-		} else {
-			$demoContent = "";
-			foreach($clanManagement[1] as $name=>$data){
-				$demoContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
+		$kickHead =  "**Kick :mans_shoe:**\r\n";
+		
+		$promoContent =  "";
+		$demoContent =  "";
+		$kickContent =  "";
+		
+		foreach($clanManagement as $tag => $data){
+			switch($data["action"]){
+				case 1:
+					//Kick
+					$kickContent .=  singleMessage($tag, $data);
+					
+					break;
+				case 2:
+					//Demotion
+					$demoContent .=  singleMessage($tag, $data);
+					break;
+				case 3:
+					//Promotion
+					$promoContent .=  singleMessage($tag, $data);
+					break;
 			}
 		}
-		
-		$kickHead =  "**Kick :mans_shoe:**\r\n";
-		if(sizeof($clanManagement[2]) == 0){
+		if($promoContent == ""){
+			$promoContent =  "  none :slight_frown:\r\n";
+		}
+		if($demoContent == ""){
+			$demoContent =  "  none :smiling_face_with_3_hearts:\r\n";
+		}
+		if($kickContent == ""){
 			$kickContent =  "  none :partying_face:\r\n";
-		} else {
-			$kickContent = "";
-			foreach($clanManagement[2] as $name=>$data){
-				$kickContent .=  "  :small_blue_diamond: ".$name." :boom: ".$data[0]." :gift: ".$data[1]."\r\n";
-			}
 		}
 		
 		if($html){
@@ -172,6 +185,10 @@
 			);
 		}
 		return array($header, $promoHead, $promoContent, $demoHead, $demoContent, $kickHead, $kickContent);
+	}
+	
+	function singleMessage($tag, $data){
+		return "  :small_blue_diamond: ".$data["name"]."(". $tag .") :boom: ".$data["battlecount"]." :gift: ".$data["donations"]."\r\n";
 	}
 	
 	function sendDiscordMessage($messageData){

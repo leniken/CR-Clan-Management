@@ -21,12 +21,10 @@
 	*/
 	const DO_coLeader_MANAGEMENT = false;
 	const LIST_coLeader_STATS = true;
-	const coLeader_MONITOR_WAR_ATTACKS = true;
-	const coLeader_MONITOR_DONATIONS = true;
 	
 	/* Define promotion parameters for your clan: Player is elder and must have more than the parameters to be promoted.
 	   Stict parametere defines if the elder has to fullfil both (true) or just one (false) parameter to get a promotion */
-	const coLeader_PROMOTION_WAR_ATTACKS = 12;	
+	const coLeader_PROMOTION_WAR_ATTACKS = 100;	
 	const coLeader_PROMOTION_DONATION = 500;
 	const coLeader_PROMOTION_STRICT = true;
 	
@@ -40,13 +38,11 @@
 	*  Set DO_ELDER_MANAGEMENT to true, to list promotions and demotions for elders. 
 	*/
 	const DO_elder_MANAGEMENT = true;
-	const elder_MONITOR_WAR_ATTACKS = true;
-	const elder_MONITOR_DONATIONS = true;
 	
-	/* Define promotion parameters for your clan: Player is member and must have more than the parameters to be promoted.
-	   Stict parametere defines if the member has to fullfil both (true) or just one (false) parameter to get a promotion */
-	const elder_PROMOTION_WAR_ATTACKS = 8;	
-	const elder_PROMOTION_DONATION = 300;
+	/* Define promotion parameters for your clan: Player is elder and must have more than the parameters to be promoted.
+	   Stict parametere defines if the elder has to fullfil both (true) or just one (false) parameter to get a promotion */
+	const elder_PROMOTION_WAR_ATTACKS = 100;	
+	const elder_PROMOTION_DONATION = 500;
 	const elder_PROMOTION_STRICT = true;
 	
 	/* Define demotion parameters for your clan: Player is elder and must have less than the parameters to be demoted. 
@@ -59,12 +55,16 @@
 	*  Set DO_MEMBER_MANAGEMENT to true, to list kicks for members that didn't fulfill the defined attack and donations values. 
 	*/
 	const DO_member_MANAGEMENT = true;
-	const member_MONITOR_WAR_ATTACKS = true;
-	const member_MONITOR_DONATIONS = true;
+	
+	/* Define promotion parameters for your clan: Player is member and must have more than the parameters to be promoted.
+	   Stict parametere defines if the member has to fullfil both (true) or just one (false) parameter to get a promotion */
+	const member_PROMOTION_WAR_ATTACKS = 8;	
+	const member_PROMOTION_DONATION = 300;
+	const member_PROMOTION_STRICT = true;
 	
 	/* Define kick parameters for your clan: Player is member and must have less than the parameters to be kicked.
 	   Stict parametere defines if the member has to fullfil both (true) or just one (false) parameter to get a kick */
-	const member_DEMOTION_WAR = 8;
+	const member_DEMOTION_WAR_ATTACKS = 8;
 	const member_DEMOTION_DONATION = 50;
 	const member_DEMOTION_STRICT = true;
 	
