@@ -43,7 +43,7 @@
 	
 	/* Discord Webhook URL.
 	   How to get the URL: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks */
-	const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/831242496080085003/_q_x4XoUUCQxUBaOEBNGn_h-GehGvSX0hbhmGuMW3XTpAySRjYyWqIZNgtiz77_1X6V4";
+	const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/831254299647934465/RKPFmbWrUsn_6nJesV1QqdAvbs1I5q642Be9sosdsf007lY_SC3fD9eyHpgveznjDFv_";
 	
 	/* The username of the bot when posting in the channel */
 	const BOT_USERNAME = "CR-BOT";
